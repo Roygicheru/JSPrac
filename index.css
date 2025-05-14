@@ -1,0 +1,12 @@
+.headingOne{
+    font-weight: 900;
+}
+
+#pTag{
+    font-weight: lighter;
+}
+
+a{
+text-decoration: underline;
+color: blue;
+}
