@@ -1,0 +1,120 @@
+<html lang="en"><head>
+  <meta charset="UTF-8">
+  <title>Simple Form with Fetch</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    form {
+      margin-bottom: 20px;
+      max-width: 400px;
+      padding: 10px;
+      border: 1px solid #ddd;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+
+    input[type="text"], input[type="email"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+    }
+
+    input[type="submit"] {
+      background-color: red;
+      color: white;
+      padding: 10px;
+      border: none;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+    }
+
+    th {
+      background-color: #f4f4f4;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Send Info to Server</h2>
+
+  <form id="myForm">
+    <label for="firstName">First Name:
+      <input type="text" id="firstName" name="firstName" required="">
+    </label>
+
+    <label for="email">Email:
+      <input type="email" id="email" name="email" required="">
+    </label>
+
+    <input type="submit" value="Submit">
+  </form>
+
+  <h3>Response:</h3>
+  <div id="result">Fill the form and click Submit.</div>
+
+  <script>
+    const form = document.getElementById('myForm');
+    const resultDiv = document.getElementById('result');
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault(); // stop form from reloading the page
+
+      // Get the values from the form
+      const firstName = document.getElementById('firstName').value;
+      const email = document.getElementById('email').value;
+
+      // Create the data object to send
+      const data = {
+        firstName: firstName,
+        email: email
+      };
+
+      // Send the data using fetch
+      fetch('https://dummyjson.com/users/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data) // turn the JS object into a JSON string
+      })
+      .then(response => response.json()) // convert the response to JS object
+      .then(data => {
+        // Show the response in a table
+        let table = '<table>';
+        table += '<tr><th>Field</th><th>Value</th></tr>';
+
+        for (let key in data) {
+          if (typeof data[key] !== 'object') { // only show simple values
+            table += `<tr><td>${key}</td><td>${data[key]}</td></tr>`;
+          }
+        }
+
+        table += '</table>';
+        resultDiv.innerHTML = table;
+      })
+      .catch(error => {
+        resultDiv.textContent = 'Error: ' + error.message;
+      });
+    });
+  </script>
+
+
+
+</body></html>
