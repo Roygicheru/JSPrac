@@ -1,6 +1,659 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product API Frontend</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 20px;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .controls {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+
+    .fetch-controls {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .fetch-controls input, .fetch-controls select {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .fetch-controls input[type="number"] {
+      width: 80px;
+    }
+
+    button {
+      background-color: #3498db;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      font-size: 18px;
+      color: #666;
+    }
+
+    .error {
+      background-color: #fee;
+      color: #c33;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+
+    .stats {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .product-card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .product-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+
+    .product-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      background: #f0f0f0;
+    }
+
+    .product-content {
+      padding: 15px;
+    }
+
+    .product-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 10px;
+    }
+
+    .product-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #2c3e50;
+      margin: 0;
+      flex: 1;
+    }
+
+    .product-price {
+      font-size: 20px;
+      font-weight: bold;
+      color: #27ae60;
+    }
+
+    .product-brand {
+      color: #7f8c8d;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+
+    .product-category {
+      display: inline-block;
+      background: #ecf0f1;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    .product-description {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    .product-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+    }
+
+    .product-rating {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .stars {
+      color: #f39c12;
+    }
+
+    .product-stock {
+      font-size: 14px;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    .in-stock {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .low-stock {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .discount-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #e74c3c;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .tags {
+      margin-top: 10px;
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      background: #3498db;
+      color: white;
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+    }
+
+    .view-details {
+      margin-top: 10px;
+      width: 100%;
+      background: #34495e;
+      color: white;
+      padding: 8px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+
+    .view-details:hover {
+      background: #2c3e50;
+    }
+
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      overflow-y: auto;
+    }
+
+    .modal-content {
+      background: white;
+      margin: 50px auto;
+      max-width: 800px;
+      border-radius: 8px;
+      position: relative;
+    }
+
+    .modal-header {
+      padding: 20px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-body {
+      padding: 20px;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 28px;
+      cursor: pointer;
+      color: #999;
+      padding: 0;
+      width: 40px;
+      height: 40px;
+    }
+
+    .close-modal:hover {
+      color: #333;
+    }
+
+    .detail-section {
+      margin-bottom: 20px;
+    }
+
+    .detail-section h3 {
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .detail-item {
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 4px;
+    }
+
+    .detail-label {
+      font-weight: 600;
+      color: #555;
+      font-size: 14px;
+    }
+
+    .detail-value {
+      color: #333;
+      margin-top: 5px;
+    }
+
+    .image-gallery {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 10px 0;
+    }
+
+    .gallery-image {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .gallery-image:hover {
+      transform: scale(1.05);
+    }
+
+    .reviews {
+      margin-top: 20px;
+    }
+
+    .review-card {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+
+    .review-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .reviewer-name {
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .review-date {
+      color: #7f8c8d;
+      font-size: 14px;
+    }
+
+    .review-comment {
+      color: #555;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Product Catalog API</h1>
+    
+    <div class="controls">
+      <div class="fetch-controls">
+        <label>
+          Skip:
+          <input type="number" id="skip" value="0" min="0">
+        </label>
+        <label>
+          Limit:
+          <input type="number" id="limit" value="30" min="1" max="100">
+        </label>
+        <label>
+          Category:
+          <select id="category">
+            <option value="">All Categories</option>
+            <option value="beauty">Beauty</option>
+            <option value="fragrances">Fragrances</option>
+            <option value="furniture">Furniture</option>
+            <option value="groceries">Groceries</option>
+          </select>
+        </label>
+        <button onclick="fetchProducts()">Fetch Products</button>
+      </div>
+    </div>
+
+    <div id="stats" class="stats" style="display: none;"></div>
+    <div id="loading" class="loading" style="display: none;">Loading products...</div>
+    <div id="error" class="error" style="display: none;"></div>
+    <div id="products" class="products-grid"></div>
+  </div>
+
+  <!-- Modal for product details -->
+  <div id="productModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle"></h2>
+        <button class="close-modal" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <script>
+    let allProducts = [];
+
+    function fetchProducts() {
+      const skip = document.getElementById('skip').value;
+      const limit = document.getElementById('limit').value;
+      const category = document.getElementById('category').value;
+      
+      let url = `https://dummyjson.com/products?skip=${skip}&limit=${limit}`;
+      if (category) {
+        url = `https://dummyjson.com/products/category/${category}?skip=${skip}&limit=${limit}`;
+      }
+      
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('error').style.display = 'none';
+      document.getElementById('products').innerHTML = '';
+      document.getElementById('stats').style.display = 'none';
+      
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          allProducts = data.products;
+          displayProducts(data);
+          displayStats(data);
+          document.getElementById('loading').style.display = 'none';
+        })
+        .catch(error => {
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('error').style.display = 'block';
+          document.getElementById('error').textContent = 'Error: ' + error.message;
+        });
+    }
+
+    function displayStats(data) {
+      const statsDiv = document.getElementById('stats');
+      statsDiv.style.display = 'block';
+      statsDiv.innerHTML = `
+        <strong>Showing ${data.products.length} products</strong> 
+        (Total: ${data.total}, Skip: ${data.skip}, Limit: ${data.limit})
+      `;
+    }
+
+    function displayProducts(data) {
+      const productsDiv = document.getElementById('products');
+      
+      data.products.forEach(product => {
+        const card = createProductCard(product);
+        productsDiv.appendChild(card);
+      });
+    }
+
+    function createProductCard(product) {
+      const card = document.createElement('div');
+      card.className = 'product-card';
+      card.style.position = 'relative';
+      
+      const stockClass = product.stock < 10 ? 'low-stock' : 'in-stock';
+      const stockText = product.stock < 10 ? `Low Stock (${product.stock})` : `In Stock (${product.stock})`;
+      
+      card.innerHTML = `
+        ${product.discountPercentage > 10 ? `<div class="discount-badge">-${product.discountPercentage.toFixed(0)}%</div>` : ''}
+        <img src="${product.thumbnail}" alt="${product.title}" class="product-image" onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+        <div class="product-content">
+          <div class="product-header">
+            <h3 class="product-title">${product.title}</h3>
+          </div>
+          <div class="product-brand">${product.brand}</div>
+          <div class="product-category">${product.category}</div>
+          <p class="product-description">${product.description}</p>
+          <div class="product-price">$${product.price}</div>
+          <div class="product-meta">
+            <div class="product-rating">
+              <span class="stars">${getStars(product.rating)}</span>
+              <span>${product.rating.toFixed(1)}</span>
+            </div>
+            <div class="product-stock ${stockClass}">${stockText}</div>
+          </div>
+          <div class="tags">
+            ${product.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+          </div>
+          <button class="view-details" onclick="showProductDetails(${product.id})">View Details</button>
+        </div>
+      `;
+      
+      return card;
+    }
+
+    function getStars(rating) {
+      const fullStars = Math.floor(rating);
+      const halfStar = rating % 1 >= 0.5 ? 1 : 0;
+      const emptyStars = 5 - fullStars - halfStar;
+      
+      return '★'.repeat(fullStars) + (halfStar ? '☆' : '') + '☆'.repeat(emptyStars);
+    }
+
+    function showProductDetails(productId) {
+      const product = allProducts.find(p => p.id === productId);
+      if (!product) return;
+      
+      const modal = document.getElementById('productModal');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalBody = document.getElementById('modalBody');
+      
+      modalTitle.textContent = product.title;
+      
+      modalBody.innerHTML = `
+        <div class="detail-section">
+          <h3>Product Images</h3>
+          <div class="image-gallery">
+            ${product.images.map(img => `
+              <img src="${img}" alt="${product.title}" class="gallery-image" onclick="window.open('${img}', '_blank')">
+            `).join('')}
+          </div>
+        </div>
+        
+        <div class="detail-section">
+          <h3>Product Information</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <div class="detail-label">Brand</div>
+              <div class="detail-value">${product.brand}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Category</div>
+              <div class="detail-value">${product.category}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">SKU</div>
+              <div class="detail-value">${product.sku}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Price</div>
+              <div class="detail-value">$${product.price} (${product.discountPercentage}% off)</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Stock</div>
+              <div class="detail-value">${product.stock} units</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Rating</div>
+              <div class="detail-value">${product.rating} / 5 (${product.reviews.length} reviews)</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="detail-section">
+          <h3>Specifications</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <div class="detail-label">Weight</div>
+              <div class="detail-value">${product.weight} kg</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Dimensions</div>
+              <div class="detail-value">${product.dimensions.width} × ${product.dimensions.height} × ${product.dimensions.depth} cm</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Minimum Order</div>
+              <div class="detail-value">${product.minimumOrderQuantity} units</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="detail-section">
+          <h3>Policies</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <div class="detail-label">Warranty</div>
+              <div class="detail-value">${product.warrantyInformation}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Shipping</div>
+              <div class="detail-value">${product.shippingInformation}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Return Policy</div>
+              <div class="detail-value">${product.returnPolicy}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="detail-section">
+          <h3>Reviews</h3>
+          <div class="reviews">
+            ${product.reviews.map(review => `
+              <div class="review-card">
+                <div class="review-header">
+                  <div>
+                    <div class="reviewer-name">${review.reviewerName}</div>
+                    <div class="product-rating">
+                      <span class="stars">${getStars(review.rating)}</span>
+                      <span>${review.rating}</span>
+                    </div>
+                  </div>
+                  <div class="review-date">${new Date(review.date).toLocaleDateString()}</div>
+                </div>
+                <div class="review-comment">${review.comment}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+      
+      modal.style.display = 'block';
+    }
+
+    function closeModal() {
+      document.getElementById('productModal').style.display = 'none';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const modal = document.getElementById('productModal');
+      if (event.target == modal) {
+        modal.style.display = 'none';
+      }
+    }
+
+    // Load products on page load
+    fetchProducts();
+  </script>
+</body>
+</html>
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
   <meta charset="UTF-8" />
   <title>Fetch Demo</title>
 </head>
@@ -9,7 +662,7 @@
   <pre id="output"></pre>
 
   <script>
-    fetch('https://dummyjson.com/todos')
+    fetch('https://dummyjson.com/products')
       .then(res => res.json())
       .then(data => {
         document.getElementById('output').textContent = JSON.stringify(data, null, 2);
@@ -19,4 +672,4 @@
       });
   </script>
 </body>
-</html>
+</html> -->
